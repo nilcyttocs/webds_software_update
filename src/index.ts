@@ -13,7 +13,7 @@ import { ILauncher } from '@jupyterlab/launcher';
 
 import { softwareUpdateIcon } from './icons';
 
-import { SoftwareUpdateWidget } from './widget';
+import { SoftwareUpdateWidget } from './widget_container';
 
 /**
  * Initialization data for the @webds/software_update extension.
