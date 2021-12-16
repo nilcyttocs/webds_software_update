@@ -5,8 +5,7 @@ import React, { useState } from 'react';
 import { SoftwareUpdateComponent } from './widget_component';
 import { requestAPI } from './handler';
 
-//const dropboxLocation = '/var/spool/syna/softwareupdater';
-const dropboxLocation = '/var/cache/syna/softwareupdater';
+const dropboxLocation = '/var/spool/syna/softwareupdater';
 const logLocation = 'Synaptics/.links/Update_Daemon_Log';
 
 const successMessage = 'Files have been placed in Software Updater dropbox. \
