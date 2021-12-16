@@ -40,7 +40,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
       },
       execute: () => {
         if (!widget || widget.isDisposed) {
-          const content = new SoftwareUpdateWidget();
+          const content = new SoftwareUpdateWidget(app);
           widget = new MainAreaWidget<SoftwareUpdateWidget>({ content });
           widget.id = 'webds_software_update_widget';
           widget.title.label = 'Software Update';

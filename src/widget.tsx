@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-
+import { JupyterFrontEnd } from '@jupyterlab/application';
 import { ReactWidget } from '@jupyterlab/apputils';
+import React, { useState } from 'react';
 
 import Fab from '@mui/material/Fab';
 import Stack from '@mui/material/Stack';
@@ -9,23 +9,29 @@ import Divider from '@mui/material/Divider';
 import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 import { styled, ThemeProvider } from '@mui/material/styles';
+import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 
 import webdsTheme from './webdsTheme';
 import { requestAPI } from './handler';
 
 const dropboxLocation = '/var/spool/syna/softwareupdater';
+const logLocation = 'Synaptics/.links/Update_Daemon_Log';
+
 const successMessage = 'Files have been placed in Software Updater dropbox. \
   Allow 5 minutes for update process to complete. \
   System may reset as part of update process.';
 const failureMessage = 'Error occurred during update process.'
 
-const SoftwareUpdateComponent = (): JSX.Element => {
+const SoftwareUpdateComponent = (props:any): JSX.Element => {
   const [tarball, setTarball] = useState<File|null>(null);
   const [manifest, setManifest] = useState<File|null>(null);
+  const [updateButtonDisabled, setUpdateButtonDisabled] = useState<boolean>(false);
+  const [logButtonDisabled, setLogButtonDisabled] = useState<boolean>(false);
   const [snack, setSnack] = useState<boolean>(false);
   const [snackMessage, setSnackMessage] = useState<string>('');
-  const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
+
+  const { commands, shell } = props.frontend;
 
   const Input = styled('input')({
     display: 'none',
@@ -53,7 +59,8 @@ const SoftwareUpdateComponent = (): JSX.Element => {
       return;
     }
 
-    setButtonDisabled(true);
+    setUpdateButtonDisabled(true);
+    setLogButtonDisabled(false);
 
     const formData = new FormData();
     formData.append('files', tarball);
@@ -74,8 +81,24 @@ const SoftwareUpdateComponent = (): JSX.Element => {
       setSnackMessage(failureMessage);
     } finally {
       setSnack(true);
-      setButtonDisabled(false);
+      setUpdateButtonDisabled(false);
+      setLogButtonDisabled(false);
     }
+  };
+
+  const showLog = async () => {
+    commands.execute('docmanager:open', {
+      path: logLocation,
+      factory: 'Editor',
+      options: {mode: 'split-right'}
+    })
+    .then((widget:any) => {
+      widget.id = 'update_daemon_log';
+      widget.title.closable = true;
+      if (!widget.isAttached)
+        shell.add(widget, 'main');
+      shell.activateById(widget.id);
+    });
   };
 
   const closeSnackBar = () => {
@@ -141,16 +164,31 @@ const SoftwareUpdateComponent = (): JSX.Element => {
               />
             </label>
           </Stack>
-          <Fab
-            variant='extended'
-            color='primary'
-            size='medium'
-            disabled={buttonDisabled || (tarball === null || manifest === null)}
-            onClick={doUpdate}
-            sx={{minWidth:200, maxWidth:200}}>
+          <Stack
+            direction="row"
+            spacing={5}
+          >
+            <Fab
+              variant='extended'
+              color='primary'
+              size='medium'
+              disabled={updateButtonDisabled || (tarball === null || manifest === null)}
+              onClick={doUpdate}
+              sx={{minWidth:200, maxWidth:200}}
+            >
               <ArrowForwardIosRoundedIcon sx={{mr:1}} />
               Update
             </Fab>
+            {logButtonDisabled === false ? (
+              <Fab
+                color="primary"
+                size="small"
+                onClick={showLog}
+              >
+                <ArticleRoundedIcon />
+              </Fab>
+            ) : (null)}
+          </Stack>
         </Stack>
         <Snackbar
           open={snack}
@@ -165,12 +203,15 @@ const SoftwareUpdateComponent = (): JSX.Element => {
 };
 
 export class SoftwareUpdateWidget extends ReactWidget {
-  constructor() {
+  frontend:JupyterFrontEnd|null = null;
+
+  constructor(app:JupyterFrontEnd) {
     super();
+    this.frontend = app;
     this.addClass('jp-webdsSoftwareUpdateWidget');
   }
 
   render(): JSX.Element {
-    return <SoftwareUpdateComponent />;
+    return <SoftwareUpdateComponent frontend={this.frontend} />;
   }
 }
