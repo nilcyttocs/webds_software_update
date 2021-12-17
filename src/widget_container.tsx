@@ -6,7 +6,7 @@ import { SoftwareUpdateComponent } from './widget_component';
 import { requestAPI } from './handler';
 
 const dropboxLocation = '/var/spool/syna/softwareupdater';
-const logLocation = 'Synaptics/.links/Update_Daemon_Log';
+const logLocation = 'Synaptics/_links/Update_Daemon_Log';
 
 const successMessage = 'Files have been placed in Software Updater dropbox. \
   Allow 5 minutes for update process to complete. \
