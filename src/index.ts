@@ -33,8 +33,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
     const { commands, shell } = app;
     const command = 'webds_software_update:open';
     commands.addCommand(command, {
-      label: 'Software Update',
-      caption: 'Software Update',
+      label: 'DSDK Update',
+      caption: 'DSDK Update',
       icon: (args: { [x: string]: any }) => {
         return args['isLauncher'] ? softwareUpdateIcon : undefined;
       },
@@ -43,7 +43,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           const content = new SoftwareUpdateWidget(app);
           widget = new MainAreaWidget<SoftwareUpdateWidget>({ content });
           widget.id = 'webds_software_update_widget';
-          widget.title.label = 'Software Update';
+          widget.title.label = 'DSDK Update';
           widget.title.icon = softwareUpdateIcon;
           widget.title.closable = true;
         }
