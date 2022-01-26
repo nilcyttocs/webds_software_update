@@ -22,8 +22,8 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
       <div>
         <Stack
           spacing={5}
-          divider={<Divider orientation='horizontal' sx={{width:475}} />}
-          sx={{marginLeft:5, marginTop:5}}
+          divider={<Divider orientation='horizontal' sx={{width: '500px'}} />}
+          sx={{marginLeft: '50px', marginTop: '50px'}}
         >
           <Stack
             spacing={2}
@@ -39,7 +39,7 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
               <Button
                 variant='contained'
                 component='span'
-                sx={{minWidth:100, maxWidth:100, marginRight:3}}
+                sx={{width: '100px', marginRight: '25px'}}
               >
                 Tarball
               </Button>
@@ -49,7 +49,7 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
                 value={props.tarball? props.tarball.name: ''}
                 InputProps={{readOnly: true}}
                 variant='standard'
-                sx={{width:350}}
+                sx={{width: '350px'}}
               />
             </label>
             <label htmlFor='button-software-update-manifest'>
@@ -62,7 +62,7 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
               <Button
                 variant='contained'
                 component='span'
-                sx={{minWidth:100, maxWidth:100, marginRight:3}}
+                sx={{width: '100px', marginRight: '25px'}}
               >
                 Manifest
               </Button>
@@ -72,12 +72,12 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
                 value={props.manifest? props.manifest.name: ''}
                 InputProps={{readOnly: true}}
                 variant='standard'
-                sx={{width:350}}
+                sx={{width: '350px'}}
               />
             </label>
           </Stack>
           <Stack
-            direction="row"
+            direction='row'
             spacing={5}
           >
             <Fab
@@ -86,15 +86,15 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
               size='medium'
               disabled={props.updateButtonDisabled || (props.tarball === null || props.manifest === null)}
               onClick={props.doUpdate}
-              sx={{minWidth:200, maxWidth:200}}
+              sx={{width: '200px'}}
             >
               <ArrowForwardIosRoundedIcon sx={{mr:1}} />
               Update
             </Fab>
             {props.logButtonDisabled === false ? (
               <Fab
-                color="primary"
-                size="small"
+                color='primary'
+                size='small'
                 onClick={props.showLog}
               >
                 <ArticleRoundedIcon />
@@ -105,7 +105,7 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
         <Snackbar
           open={props.snack}
           autoHideDuration={7000}
-          anchorOrigin={{vertical:'bottom', horizontal:'center'}}
+          anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
           message={props.snackMessage}
           onClose={props.closeSnackBar}
         />

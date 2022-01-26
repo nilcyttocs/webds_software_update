@@ -2,7 +2,7 @@ import { JupyterFrontEnd } from '@jupyterlab/application';
 import { ReactWidget } from '@jupyterlab/apputils';
 import React, { useState } from 'react';
 
-import { SoftwareUpdateComponent } from './widget_component';
+import { SoftwareUpdateComponent } from './widget_mui';
 import { requestAPI } from './handler';
 
 const dropboxLocation = '/var/spool/syna/softwareupdater';
