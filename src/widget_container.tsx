@@ -13,7 +13,7 @@ const successMessage = 'Files have been placed in Software Updater dropbox. \
   System may reset as part of update process.';
 const failureMessage = 'Error occurred during update process.'
 
-const SoftwareUpdateContainer = (props:any): JSX.Element => {
+const SoftwareUpdateContainer = (props: any): JSX.Element => {
   const [tarball, setTarball] = useState<File|null>(null);
   const [manifest, setManifest] = useState<File|null>(null);
   const [updateButtonDisabled, setUpdateButtonDisabled] = useState<boolean>(false);
@@ -23,7 +23,7 @@ const SoftwareUpdateContainer = (props:any): JSX.Element => {
 
   const { commands, shell } = props.frontend;
 
-  const selectFile = (event:React.ChangeEvent<HTMLInputElement>) => {
+  const selectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files === null) {
       return;
     }
@@ -78,7 +78,7 @@ const SoftwareUpdateContainer = (props:any): JSX.Element => {
       factory: 'Editor',
       options: {mode: 'split-right'}
     })
-    .then((widget:any) => {
+    .then((widget: any) => {
       widget.id = 'update_daemon_log';
       widget.title.closable = true;
       if (!widget.isAttached)
@@ -108,15 +108,18 @@ const SoftwareUpdateContainer = (props:any): JSX.Element => {
 };
 
 export class SoftwareUpdateWidget extends ReactWidget {
-  frontend:JupyterFrontEnd|null = null;
+  frontend: JupyterFrontEnd|null = null;
 
-  constructor(app:JupyterFrontEnd) {
+  constructor(app: JupyterFrontEnd) {
     super();
     this.frontend = app;
-    this.addClass('jp-webdsSoftwareUpdateWidget');
   }
 
   render(): JSX.Element {
-    return <SoftwareUpdateContainer frontend={this.frontend} />;
+    return (
+      <div className='jp-webdsSoftwareUpdate-container'>
+        <SoftwareUpdateContainer frontend={this.frontend}/>
+      </div>
+    );
   }
 }

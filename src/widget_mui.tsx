@@ -86,7 +86,7 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
               size='medium'
               disabled={props.updateButtonDisabled || (props.tarball === null || props.manifest === null)}
               onClick={props.doUpdate}
-              sx={{width: '200px'}}
+              sx={{minWidth: '200px', maxWidth: '200px'}}
             >
               <ArrowForwardIosRoundedIcon sx={{mr:1}} />
               Update
