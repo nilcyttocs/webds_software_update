@@ -22,7 +22,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: '@webds/software_update:plugin',
   autoStart: true,
   requires: [ILauncher, ILayoutRestorer],
-  activate: async (
+  activate: (
     app: JupyterFrontEnd,
     launcher: ILauncher,
     restorer: ILayoutRestorer
