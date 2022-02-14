@@ -12,6 +12,8 @@ import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRound
 
 import webdsTheme from './webdsTheme';
 
+const dividerWidth = 200 + 40 + 40;
+
 export const SoftwareUpdateComponent = (props:any): JSX.Element => {
   const Input = styled('input')({
     display: 'none',
@@ -22,7 +24,7 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
       <div>
         <Stack
           spacing={5}
-          divider={<Divider orientation='horizontal' sx={{width: '500px'}} />}
+          divider={<Divider orientation='horizontal' sx={{width: dividerWidth + 'px'}} />}
           sx={{marginLeft: '50px', marginTop: '50px'}}
         >
           <Stack
