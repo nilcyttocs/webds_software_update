@@ -10,7 +10,7 @@ import { styled, ThemeProvider } from '@mui/material/styles';
 import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 
-import webdsTheme from './webdsTheme';
+import webdsTheme from './webds_theme';
 
 const dividerWidth = 200 + 40 + 40;
 
@@ -39,7 +39,6 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
                 onChange={props.selectFile}
               />
               <Button
-                variant='contained'
                 component='span'
                 sx={{width: '100px', marginRight: '25px'}}
               >
@@ -62,7 +61,6 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
                 onChange={props.selectFile}
               />
               <Button
-                variant='contained'
                 component='span'
                 sx={{width: '100px', marginRight: '25px'}}
               >
@@ -95,8 +93,6 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
             </Fab>
             {props.logButtonDisabled === false ? (
               <Fab
-                color='primary'
-                size='small'
                 onClick={props.showLog}
               >
                 <ArticleRoundedIcon />
