@@ -61,7 +61,7 @@ const SoftwareUpdateContainer = (props: any): JSX.Element => {
       console.log(response);
       setSnackMessage(successMessage);
     } catch (error) {
-      console.error(`ERROR - POST /webds/filesystem\n${error}`);
+      console.error(`Error - POST /webds/filesystem\n${error}`);
       setSnackMessage(failureMessage);
     } finally {
       setSnack(true);
