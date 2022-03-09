@@ -25,7 +25,7 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
         <Stack
           spacing={5}
           divider={<Divider orientation='horizontal' sx={{width: dividerWidth + 'px'}} />}
-          sx={{marginLeft: '50px', marginTop: '50px'}}
+          sx={{marginLeft: '24px', marginTop: '20px'}}
         >
           <Stack
             spacing={2}
