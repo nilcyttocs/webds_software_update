@@ -10,26 +10,22 @@ import { styled, ThemeProvider } from '@mui/material/styles';
 import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 
-import webdsTheme from './webds_theme';
-
 const dividerWidth = 200 + 40 + 40;
 
-export const SoftwareUpdateComponent = (props:any): JSX.Element => {
+export const SoftwareUpdateMui = (props:any): JSX.Element => {
   const Input = styled('input')({
     display: 'none',
   });
 
   return (
-    <ThemeProvider theme={webdsTheme}>
+    <ThemeProvider theme={props.theme}>
       <div>
         <Stack
           spacing={5}
           divider={<Divider orientation='horizontal' sx={{width: dividerWidth + 'px'}} />}
-          sx={{marginLeft: '24px', marginTop: '20px'}}
         >
           <Stack
             spacing={2}
-            sx={{whiteSpace:'nowrap'}}
           >
             <label htmlFor='button-software-update-tarball'>
               <Input
@@ -77,8 +73,9 @@ export const SoftwareUpdateComponent = (props:any): JSX.Element => {
             </label>
           </Stack>
           <Stack
-            direction='row'
             spacing={5}
+            direction='row'
+            sx={{width: dividerWidth + 'px'}}
           >
             <Fab
               variant='extended'

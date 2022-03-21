@@ -2,7 +2,10 @@ import { JupyterFrontEnd } from '@jupyterlab/application';
 import { ReactWidget } from '@jupyterlab/apputils';
 import React, { useState } from 'react';
 
-import { SoftwareUpdateComponent } from './widget_mui';
+import { WebDSService } from '@webds/service';
+
+import { SoftwareUpdateMui } from './widget_mui';
+
 import { requestAPI } from './handler';
 
 const dropboxLocation = '/var/spool/syna/softwareupdater';
@@ -89,34 +92,41 @@ const SoftwareUpdateContainer = (props: any): JSX.Element => {
     setSnack(false);
   };
 
+  const webdsTheme = props.service.ui.getWebDSTheme();
+
   return (
-    <SoftwareUpdateComponent
-      tarball={tarball}
-      manifest={manifest}
-      updateButtonDisabled={updateButtonDisabled}
-      logButtonDisabled={logButtonDisabled}
-      snack={snack}
-      snackMessage={snackMessage}
-      selectFile={selectFile}
-      doUpdate={doUpdate}
-      showLog={showLog}
-      closeSnackBar={closeSnackBar}
-    />
+    <div className='jp-webds-widget-body'>
+      <SoftwareUpdateMui
+        theme={webdsTheme}
+        tarball={tarball}
+        manifest={manifest}
+        updateButtonDisabled={updateButtonDisabled}
+        logButtonDisabled={logButtonDisabled}
+        snack={snack}
+        snackMessage={snackMessage}
+        selectFile={selectFile}
+        doUpdate={doUpdate}
+        showLog={showLog}
+        closeSnackBar={closeSnackBar}
+      />
+    </div>
   );
 };
 
 export class SoftwareUpdateWidget extends ReactWidget {
   frontend: JupyterFrontEnd|null = null;
+  service: WebDSService|null = null;
 
-  constructor(app: JupyterFrontEnd) {
+  constructor(app: JupyterFrontEnd, service: WebDSService) {
     super();
     this.frontend = app;
+    this.service = service;
   }
 
   render(): JSX.Element {
     return (
-      <div className='jp-webdsSoftwareUpdate-container'>
-        <SoftwareUpdateContainer frontend={this.frontend}/>
+      <div className='jp-webds-widget'>
+        <SoftwareUpdateContainer frontend={this.frontend} service={this.service}/>
       </div>
     );
   }

@@ -11,6 +11,8 @@ import {
 
 import { ILauncher } from '@jupyterlab/launcher';
 
+import { WebDSService } from '@webds/service';
+
 import { softwareUpdateIcon } from './icons';
 
 import { SoftwareUpdateWidget } from './widget_container';
@@ -21,27 +23,28 @@ import { SoftwareUpdateWidget } from './widget_container';
 const plugin: JupyterFrontEndPlugin<void> = {
   id: '@webds/software_update:plugin',
   autoStart: true,
-  requires: [ILauncher, ILayoutRestorer],
+  requires: [ILauncher, ILayoutRestorer, WebDSService],
   activate: (
     app: JupyterFrontEnd,
     launcher: ILauncher,
-    restorer: ILayoutRestorer
+    restorer: ILayoutRestorer,
+    service: WebDSService
   ) => {
     console.log('JupyterLab extension @webds/software_update is activated!');
 
     let widget: MainAreaWidget;
-    const { commands, shell } = app;
+    const {commands, shell} = app;
     const command = 'webds_software_update:open';
     commands.addCommand(command, {
       label: 'DSDK Update',
       caption: 'DSDK Update',
-      icon: (args: { [x: string]: any }) => {
+      icon: (args: {[x: string]: any}) => {
         return args['isLauncher'] ? softwareUpdateIcon : undefined;
       },
       execute: () => {
         if (!widget || widget.isDisposed) {
-          const content = new SoftwareUpdateWidget(app);
-          widget = new MainAreaWidget<SoftwareUpdateWidget>({ content });
+          const content = new SoftwareUpdateWidget(app, service);
+          widget = new MainAreaWidget<SoftwareUpdateWidget>({content});
           widget.id = 'webds_software_update_widget';
           widget.title.label = 'DSDK Update';
           widget.title.icon = softwareUpdateIcon;
@@ -58,10 +61,10 @@ const plugin: JupyterFrontEndPlugin<void> = {
       },
     });
 
-    launcher.add({ command, args: { isLauncher: true }, category: 'WebDS', rank: 2 });
+    launcher.add({command, args: {isLauncher: true}, category: 'WebDS', rank: 2});
 
-    let tracker = new WidgetTracker<MainAreaWidget>({ namespace: 'webds_software_update' });
-    restorer.restore(tracker, { command, name: () => 'webds_software_update' });
+    let tracker = new WidgetTracker<MainAreaWidget>({namespace: 'webds_software_update'});
+    restorer.restore(tracker, {command, name: () => 'webds_software_update'});
   }
 };
 
