@@ -1,35 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { JupyterFrontEnd } from "@jupyterlab/application";
 
 import { ReactWidget } from "@jupyterlab/apputils";
 
+import Alert from "@mui/material/Alert";
+
+import CircularProgress from "@mui/material/CircularProgress";
+
 import { ThemeProvider } from "@mui/material/styles";
 
 import { WebDSService } from "@webds/service";
 
-import { SoftwareUpdateMui } from "./widget_mui";
+import { Landing } from "./widget_landing";
 
 import { requestAPI } from "./handler";
 
+let alertMessage = "";
+
 const dropboxLocation = "/var/spool/syna/softwareupdater";
+
 const logLocation = "Synaptics/_links/Update_Daemon_Log";
 
 const successMessage =
-  "Files have been placed in Software Updater dropbox. \
-  Allow 5 minutes for update process to complete. \
-  System may reset as part of update process.";
+  "Files have been placed in Software Updater dropbox. Allow 5 minutes for update process to complete. System may reset as part of update process.";
+
 const failureMessage = "Error occurred during update process.";
 
 const SoftwareUpdateContainer = (props: any): JSX.Element => {
+  const [initialized, setInitialized] = useState<boolean>(false);
+  const [alert, setAlert] = useState<boolean>(false);
   const [tarball, setTarball] = useState<File | null>(null);
   const [manifest, setManifest] = useState<File | null>(null);
   const [updateButtonDisabled, setUpdateButtonDisabled] = useState<boolean>(
     false
   );
-  const [logButtonDisabled, setLogButtonDisabled] = useState<boolean>(false);
-  const [snack, setSnack] = useState<boolean>(false);
-  const [snackMessage, setSnackMessage] = useState<string>("");
+  const [snackBar, setSnackBar] = useState<boolean>(false);
+  const [snackBarMessage, setSnackBarMessage] = useState<string>("");
 
   const { commands, shell } = props.frontend;
 
@@ -56,7 +63,6 @@ const SoftwareUpdateContainer = (props: any): JSX.Element => {
     }
 
     setUpdateButtonDisabled(true);
-    setLogButtonDisabled(false);
 
     const formData = new FormData();
     formData.append("files", tarball);
@@ -64,19 +70,17 @@ const SoftwareUpdateContainer = (props: any): JSX.Element => {
     formData.append("location", dropboxLocation);
 
     try {
-      const response = await requestAPI<any>("filesystem", {
+      await requestAPI<any>("filesystem", {
         body: formData,
         method: "POST"
       });
-      console.log(response);
-      setSnackMessage(successMessage);
+      setSnackBarMessage(successMessage);
     } catch (error) {
       console.error(`Error - POST /webds/filesystem\n${error}`);
-      setSnackMessage(failureMessage);
+      setSnackBarMessage(failureMessage);
     } finally {
-      setSnack(true);
+      setSnackBar(true);
       setUpdateButtonDisabled(false);
-      setLogButtonDisabled(false);
     }
   };
 
@@ -96,26 +100,57 @@ const SoftwareUpdateContainer = (props: any): JSX.Element => {
   };
 
   const closeSnackBar = () => {
-    setSnack(false);
+    setSnackBar(false);
   };
+
+  const initialize = async () => {
+    setInitialized(true);
+  };
+
+  useEffect(() => {
+    initialize();
+  }, []);
 
   const webdsTheme = props.service.ui.getWebDSTheme();
 
   return (
     <div className="jp-webds-widget-body">
       <ThemeProvider theme={webdsTheme}>
-        <SoftwareUpdateMui
-          tarball={tarball}
-          manifest={manifest}
-          updateButtonDisabled={updateButtonDisabled}
-          logButtonDisabled={logButtonDisabled}
-          snack={snack}
-          snackMessage={snackMessage}
-          selectFile={selectFile}
-          doUpdate={doUpdate}
-          showLog={showLog}
-          closeSnackBar={closeSnackBar}
-        />
+        {initialized ? (
+          <Landing
+            tarball={tarball}
+            manifest={manifest}
+            selectFile={selectFile}
+            doUpdate={doUpdate}
+            showLog={showLog}
+            snackBar={snackBar}
+            snackBarMessage={snackBarMessage}
+            closeSnackBar={closeSnackBar}
+            updateButtonDisabled={updateButtonDisabled}
+          />
+        ) : (
+          <>
+            {alert && (
+              <Alert
+                severity="error"
+                onClose={() => setAlert(false)}
+                sx={{ whiteSpace: "pre-wrap" }}
+              >
+                {alertMessage}
+              </Alert>
+            )}
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)"
+              }}
+            >
+              <CircularProgress color="primary" />
+            </div>
+          </>
+        )}
       </ThemeProvider>
     </div>
   );
