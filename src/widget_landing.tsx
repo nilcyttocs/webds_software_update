@@ -16,6 +16,11 @@ const HEIGHT_TITLE = 70;
 const HEIGHT_CONTENT = 200;
 const HEIGHT_CONTROLS = 100;
 
+const showHelp = false;
+
+const latestTarballLink =
+  " https://confluence.synaptics.com/display/PRJRN/%5BPinormOS%5D+Latest+Release";
+
 const Input = styled("input")({
   display: "none"
 });
@@ -43,19 +48,21 @@ export const Landing = (props: any): JSX.Element => {
           >
             DSDK Update
           </Typography>
-          <Button
-            variant="text"
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "8px",
-              transform: "translate(0%, -50%)"
-            }}
-          >
-            <Typography variant="body2" sx={{ textDecoration: "underline" }}>
-              Help
-            </Typography>
-          </Button>
+          {showHelp && (
+            <Button
+              variant="text"
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "16px",
+                transform: "translate(0%, -50%)"
+              }}
+            >
+              <Typography variant="body2" sx={{ textDecoration: "underline" }}>
+                Help
+              </Typography>
+            </Button>
+          )}
         </Box>
         <Box
           sx={{
@@ -170,6 +177,20 @@ export const Landing = (props: any): JSX.Element => {
               onClose={props.closeSnackBar}
             />
           </div>
+          <Button
+            variant="text"
+            onClick={() => window.open(latestTarballLink, "_blank")?.focus()}
+            sx={{
+              position: "absolute",
+              top: "50%",
+              right: "16px",
+              transform: "translate(0%, -50%)"
+            }}
+          >
+            <Typography variant="body2" sx={{ textDecoration: "underline" }}>
+              Latest Tarball
+            </Typography>
+          </Button>
         </Box>
       </Stack>
     </>
