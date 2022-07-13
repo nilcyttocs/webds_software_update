@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { JupyterFrontEnd } from "@jupyterlab/application";
 
@@ -10,59 +10,109 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import { ThemeProvider } from "@mui/material/styles";
 
-import { WebDSService } from "@webds/service";
+import { OSInfo, WebDSService } from "@webds/service";
 
 import { Landing } from "./widget_landing";
 
+import { Manual } from "./widget_manual";
+
 import { requestAPI } from "./handler";
 
-let alertMessage = "";
+export enum Page {
+  Landing = "LANDING",
+  Manual = "MANUAL"
+}
+
+export interface Tarball {
+  tarball: File;
+  manifest: File;
+}
+
+const SSE_CLOSED = 2;
+
+let eventSource: EventSource | undefined = undefined;
 
 const dropboxLocation = "/var/spool/syna/softwareupdater";
 
 const logLocation = "Synaptics/_links/Update_Daemon_Log";
 
-const successMessage =
-  "Files have been placed in Software Updater dropbox. Allow 5 minutes for update process to complete. System may reset as part of update process.";
+let alertMessage = "";
 
-const failureMessage = "Error occurred during update process.";
+const alertMessageUploadTarball = "Failed to upload tarball files to dropbox.";
+
+let progressPromise: Promise<string>;
 
 const SoftwareUpdateContainer = (props: any): JSX.Element => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [alert, setAlert] = useState<boolean>(false);
-  const [tarball, setTarball] = useState<File | null>(null);
-  const [manifest, setManifest] = useState<File | null>(null);
-  const [updateButtonDisabled, setUpdateButtonDisabled] = useState<boolean>(
-    false
-  );
-  const [snackBar, setSnackBar] = useState<boolean>(false);
-  const [snackBarMessage, setSnackBarMessage] = useState<string>("");
+  const [page, setPage] = useState<Page>(Page.Landing);
+  const [osInfo, setOSInfo] = useState<OSInfo | null>(null);
+  const [updateStatus, setUpdateStatus] = useState<string>("");
+  const [tarballAuto, setTarballAuto] = useState<Tarball | null>(null);
+  const [tarballManual, setTarballManual] = useState<Tarball | null>(null);
+
+  const updateStatusRef = useRef(updateStatus);
 
   const { commands, shell } = props.frontend;
 
-  const selectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files === null) {
-      return;
-    }
+  const eventHandler = (event: any) => {
+    const data = JSON.parse(event.data);
+    const status = data.status.toLowerCase();
+    setUpdateStatus(status);
+    updateStatusRef.current = status;
+  };
 
-    switch (event.target.id) {
-      case "button-software-update-tarball":
-        setTarball(event.target.files[0]);
-        break;
-      case "button-software-update-manifest":
-        setManifest(event.target.files[0]);
-        break;
-      default:
-        break;
+  const removeEvent = () => {
+    if (eventSource && eventSource.readyState !== SSE_CLOSED) {
+      eventSource.removeEventListener("software-update", eventHandler, false);
+      eventSource.close();
+      eventSource = undefined;
     }
   };
 
-  const doUpdate = async () => {
-    if (!tarball || !manifest) {
+  const errorHandler = (error: any) => {
+    removeEvent();
+    console.error(`Error - GET /webds/software-update\n${error}`);
+  };
+
+  const addEvent = () => {
+    if (eventSource) {
       return;
     }
 
-    setUpdateButtonDisabled(true);
+    eventSource = new window.EventSource(
+      "/webds/software-update"
+    );
+    eventSource.addEventListener("software-update", eventHandler, false);
+    eventSource.addEventListener("error", errorHandler, false);
+  };
+
+  const updateOSInfo = () => {
+    setOSInfo(props.service.pinormos.getOSInfo());
+  }
+
+  const monitorUpdate = (): Promise<string> => {
+    progressPromise = new Promise(function (resolve, reject) {
+      const checkProgress = () => {
+        if (updateStatusRef.current === "idle") {
+          setUpdateStatus("");
+          updateStatusRef.current = "";
+          removeEvent();
+          resolve("done");
+        } else {
+          setTimeout(checkProgress, 500);
+        }
+      };
+      setTimeout(checkProgress, 500);
+    });
+    addEvent();
+    return progressPromise;
+  };
+
+  const uploadTarball = async (tarball: File, manifest: File) => {
+    if (!tarball || !manifest) {
+      return;
+    }
 
     const formData = new FormData();
     formData.append("files", tarball);
@@ -74,13 +124,11 @@ const SoftwareUpdateContainer = (props: any): JSX.Element => {
         body: formData,
         method: "POST"
       });
-      setSnackBarMessage(successMessage);
     } catch (error) {
       console.error(`Error - POST /webds/filesystem\n${error}`);
-      setSnackBarMessage(failureMessage);
-    } finally {
-      setSnackBar(true);
-      setUpdateButtonDisabled(false);
+      alertMessage = alertMessageUploadTarball;
+      setAlert(true);
+      return Promise.reject("Failed to upload tarball files to dropbox");
     }
   };
 
@@ -99,16 +147,53 @@ const SoftwareUpdateContainer = (props: any): JSX.Element => {
       });
   };
 
-  const closeSnackBar = () => {
-    setSnackBar(false);
+  const changePage = (newPage: Page) => {
+    setPage(newPage);
   };
 
-  const initialize = async () => {
-    setInitialized(true);
+  const displayPage = (): JSX.Element | null => {
+    switch (page) {
+      case Page.Landing:
+        return (
+          <Landing
+            showLog={showLog}
+            changePage={changePage}
+            tarball={tarballAuto}
+            setTarball={setTarballAuto}
+            uploadTarball={uploadTarball}
+            monitorUpdate={monitorUpdate}
+            updateStatus={updateStatus}
+            osInfo={osInfo}
+            updateOSInfo={updateOSInfo}
+          />
+        );
+      case Page.Manual:
+        return (
+          <Manual
+            showLog={showLog}
+            changePage={changePage}
+            tarball={tarballManual}
+            setTarball={setTarballManual}
+            uploadTarball={uploadTarball}
+            monitorUpdate={monitorUpdate}
+            updateStatus={updateStatus}
+            updateOSInfo={updateOSInfo}
+          />
+        );
+      default:
+        return null;
+    }
   };
 
   useEffect(() => {
+    const initialize = async () => {
+      updateOSInfo();
+      setInitialized(true);
+    };
     initialize();
+    return () => {
+      removeEvent();
+    };
   }, []);
 
   const webdsTheme = props.service.ui.getWebDSTheme();
@@ -116,29 +201,19 @@ const SoftwareUpdateContainer = (props: any): JSX.Element => {
   return (
     <div className="jp-webds-widget-body">
       <ThemeProvider theme={webdsTheme}>
+        {alert && (
+          <Alert
+            severity="error"
+            onClose={() => setAlert(false)}
+            sx={{ marginBottom: "16px", whiteSpace: "pre-wrap" }}
+          >
+            {alertMessage}
+          </Alert>
+        )}
         {initialized ? (
-          <Landing
-            tarball={tarball}
-            manifest={manifest}
-            selectFile={selectFile}
-            doUpdate={doUpdate}
-            showLog={showLog}
-            snackBar={snackBar}
-            snackBarMessage={snackBarMessage}
-            closeSnackBar={closeSnackBar}
-            updateButtonDisabled={updateButtonDisabled}
-          />
+          displayPage()
         ) : (
           <>
-            {alert && (
-              <Alert
-                severity="error"
-                onClose={() => setAlert(false)}
-                sx={{ whiteSpace: "pre-wrap" }}
-              >
-                {alertMessage}
-              </Alert>
-            )}
             <div
               style={{
                 position: "absolute",
@@ -160,7 +235,10 @@ export class SoftwareUpdateWidget extends ReactWidget {
   frontend: JupyterFrontEnd | null = null;
   service: WebDSService | null = null;
 
-  constructor(app: JupyterFrontEnd, service: WebDSService) {
+  constructor(
+    app: JupyterFrontEnd,
+    service: WebDSService,
+  ) {
     super();
     this.frontend = app;
     this.service = service;

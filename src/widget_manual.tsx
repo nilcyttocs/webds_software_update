@@ -6,7 +6,9 @@ import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
+import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { styled } from "@mui/material/styles";
 import LinearProgress from "@mui/material/LinearProgress";
 import ArticleRoundedIcon from "@mui/icons-material/ArticleRounded";
 
@@ -19,84 +21,46 @@ const HEIGHT_CONTROLS = 100;
 
 const showHelp = false;
 
-let alertMessage = "";
-const alertMessageDownloadTarball = "Failed to download tarball from server.";
-const alertMessageDownloadManifest = "Failed to download manifest from server.";
+const latestTarballLink =
+  " https://confluence.synaptics.com/display/PRJRN/%5BPinormOS%5D+Latest+Release";
 
-export const Landing = (props: any): JSX.Element => {
-  const [alert, setAlert] = useState<boolean>(false);
+const Input = styled("input")({
+  display: "none"
+});
+
+export const Manual = (props: any): JSX.Element => {
   const [snackbar, setSnackbar] = useState<boolean>(false);
   const [updating, setUpdating] = useState<boolean>(false);
   const [progress, setProgress] = useState<string>("");
 
-  const doUpdate = async () => {
-    setUpdating(true);
-
-    let tarballFile: File;
-    let manifestFile: File;
-
-    if (!props.tarball) {
-      setProgress("Downloading Tarball from Server");
-      const requestHeaders: HeadersInit = new Headers();
-      requestHeaders.set("Content-Type", "application/x-tgz");
-
-      let request = new Request(props.osInfo.repo.tarball, {
-        method: "GET",
-        mode: "cors",
-        headers: requestHeaders,
-        referrerPolicy: "no-referrer"
-      });
-      let response: Response;
-      try {
-        response = await fetch(request);
-      } catch (error) {
-        console.error(`Error - GET ${props.osInfo.repo.tarball}\n${error}`);
-        alertMessage = alertMessageDownloadTarball;
-        setAlert(true);
-        setProgress("");
-        setUpdating(false);
-        return;
-      }
-      const tarballBlob = await response.blob();
-      let tarballName = props.osInfo.repo.tarball.split("/");
-      tarballName = tarballName[tarballName.length - 1];
-      tarballFile = new File([tarballBlob], tarballName);
-      console.log(tarballFile);
-
-      request = new Request(props.osInfo.repo.manifest, {
-        method: "GET",
-        mode: "cors",
-        headers: requestHeaders,
-        referrerPolicy: "no-referrer"
-      });
-      try {
-        response = await fetch(request);
-      } catch (error) {
-        console.error(`Error - GET ${props.osInfo.repo.manifest}\n${error}`);
-        alertMessage = alertMessageDownloadManifest;
-        setAlert(true);
-        setProgress("");
-        setUpdating(false);
-        return;
-      }
-      const manifestBlob = await response.blob();
-      let manifestName = props.osInfo.repo.manifest.split("/");
-      manifestName = manifestName[manifestName.length - 1];
-      manifestFile = new File([manifestBlob], manifestName);
-      console.log(manifestFile);
-
-      props.setTarball({
-        tarball: tarballFile,
-        manifest: manifestFile
-      });
-    } else {
-      tarballFile = props.tarball.tarball;
-      manifestFile = props.tarball.manifest;
+  const selectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files === null) {
+      return;
     }
 
+    switch (event.target.id) {
+      case "button-software-update-tarball":
+        props.setTarball({
+          ...props.tarball,
+          tarball: event.target.files[0]
+        });
+        break;
+      case "button-software-update-manifest":
+        props.setTarball({
+          ...props.tarball,
+          manifest: event.target.files[0]
+        });
+        break;
+      default:
+        break;
+    }
+  };
+
+  const doUpdate = async () => {
     try {
+      setUpdating(true);
       setProgress("Transferring Tarball Files to Dropbox");
-      await props.uploadTarball(tarballFile, manifestFile);
+      await props.uploadTarball(props.tarball.tarball, props.tarball.manifest);
       setProgress("Performing Update");
       await props.monitorUpdate();
     } catch (error) {
@@ -110,15 +74,6 @@ export const Landing = (props: any): JSX.Element => {
 
   return (
     <>
-      {alert && (
-        <Alert
-          severity="error"
-          onClose={() => setAlert(false)}
-          sx={{ marginBottom: "16px", whiteSpace: "pre-wrap" }}
-        >
-          {alertMessage}
-        </Alert>
-      )}
       <Stack spacing={2}>
         <Box
           sx={{
@@ -163,20 +118,7 @@ export const Landing = (props: any): JSX.Element => {
             bgcolor: "section.main"
           }}
         >
-          {props.osInfo.current.version >= props.osInfo.repo.version ? (
-            <Typography
-              variant="h4"
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                color: (theme) => theme.palette.text.disabled
-              }}
-            >
-              No Update Available
-            </Typography>
-          ) : updating ? (
+          {updating ? (
             <div
               style={{
                 position: "absolute",
@@ -194,17 +136,95 @@ export const Landing = (props: any): JSX.Element => {
               <LinearProgress />
             </div>
           ) : (
-            <Typography
-              variant="h4"
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)"
-              }}
-            >
-              Version {props.osInfo.repo.version} Available
-            </Typography>
+            <>
+              <div
+                style={{
+                  width: "600px",
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)"
+                }}
+              >
+                <Stack spacing={3}>
+                  <label
+                    htmlFor="button-software-update-tarball"
+                    style={{ display: "flex" }}
+                  >
+                    <Input
+                      id="button-software-update-tarball"
+                      type="file"
+                      accept=".tgz"
+                      onChange={selectFile}
+                    />
+                    <Button
+                      component="span"
+                      sx={{ width: "100px", marginRight: "24px" }}
+                    >
+                      Tarball
+                    </Button>
+                    <TextField
+                      id="file-software-update-tarball"
+                      value={
+                        props.tarball && props.tarball.tarball
+                          ? props.tarball.tarball.name
+                          : ""
+                      }
+                      InputProps={{ readOnly: true }}
+                      variant="standard"
+                      sx={{ width: "100%" }}
+                    />
+                  </label>
+                  <label
+                    htmlFor="button-software-update-manifest"
+                    style={{ display: "flex" }}
+                  >
+                    <Input
+                      id="button-software-update-manifest"
+                      type="file"
+                      accept=".tgz"
+                      onChange={selectFile}
+                    />
+                    <Button
+                      component="span"
+                      sx={{ width: "100px", marginRight: "24px" }}
+                    >
+                      Manifest
+                    </Button>
+                    <TextField
+                      id="file-software-update-manifest"
+                      value={
+                        props.tarball && props.tarball.manifest
+                          ? props.tarball.manifest.name
+                          : ""
+                      }
+                      InputProps={{ readOnly: true }}
+                      variant="standard"
+                      sx={{ width: "100%" }}
+                    />
+                  </label>
+                </Stack>
+              </div>
+              <Button
+                variant="text"
+                onClick={() =>
+                  window.open(latestTarballLink, "_blank")?.focus()
+                }
+                sx={{
+                  position: "absolute",
+                  bottom: "0px",
+                  right: "0px",
+                  transform: "translate(0%, 0%)"
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ textDecoration: "underline" }}
+                >
+                  Latest Tarball
+                </Typography>
+              </Button>
+            </>
           )}
         </Box>
         <Box
@@ -225,7 +245,9 @@ export const Landing = (props: any): JSX.Element => {
           >
             <Button
               disabled={
-                props.osInfo.current.version >= props.osInfo.repo.version ||
+                props.tarball === null ||
+                props.tarball.tarball === null ||
+                props.tarball.manifest === null ||
                 updating
               }
               onClick={async () => {
@@ -255,7 +277,7 @@ export const Landing = (props: any): JSX.Element => {
               if (event.detail < 3) {
                 return;
               }
-              props.changePage(Page.Manual);
+              props.changePage(Page.Landing);
             }}
             sx={{
               position: "absolute",
