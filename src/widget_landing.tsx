@@ -158,19 +158,20 @@ export const Landing = (props: any): JSX.Element => {
         <Box
           sx={{
             width: WIDTH + "px",
-            height: HEIGHT_CONTENT + "px",
+            minHeight: HEIGHT_CONTENT + "px",
             position: "relative",
-            bgcolor: "section.main"
+            bgcolor: "section.main",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center"
           }}
         >
           {props.osInfo.current.version >= props.osInfo.repo.version ? (
             <Typography
               variant="h4"
               sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
+                margin: "24px",
                 color: (theme) => theme.palette.text.disabled
               }}
             >
@@ -179,10 +180,7 @@ export const Landing = (props: any): JSX.Element => {
           ) : updating ? (
             <div
               style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)"
+                margin: "24px"
               }}
             >
               <Typography variant="h5">
@@ -197,10 +195,7 @@ export const Landing = (props: any): JSX.Element => {
             <Typography
               variant="h4"
               sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)"
+                margin: "24px"
               }}
             >
               Version {props.osInfo.repo.version} Available
@@ -210,17 +205,18 @@ export const Landing = (props: any): JSX.Element => {
         <Box
           sx={{
             width: WIDTH + "px",
-            height: HEIGHT_CONTROLS + "px",
+            minHeight: HEIGHT_CONTROLS + "px",
             position: "relative",
-            bgcolor: "section.main"
+            bgcolor: "section.main",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center"
           }}
         >
           <div
             style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)"
+              margin: "24px"
             }}
           >
             <Button
