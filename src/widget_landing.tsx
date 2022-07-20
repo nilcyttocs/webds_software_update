@@ -238,7 +238,7 @@ export const Landing = (props: any): JSX.Element => {
             sx={{
               position: "absolute",
               top: "50%",
-              right: "16px",
+              right: "24px",
               transform: "translate(0%, -50%)"
             }}
           >
