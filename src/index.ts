@@ -14,6 +14,15 @@ import { softwareUpdateIcon } from "./icons";
 
 import { SoftwareUpdateWidget } from "./widget_container";
 
+namespace Attributes {
+  export const command = "webds_software_update:open";
+  export const id = "webds_software_update_widget";
+  export const label = "DSDK Update";
+  export const caption = "DSDK Update";
+  export const category = "DSDK - Application";
+  export const rank = 30;
+}
+
 /**
  * Initialization data for the @webds/software_update extension.
  */
@@ -31,10 +40,10 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
     let widget: WebDSWidget;
     const { commands, shell } = app;
-    const command = "webds_software_update:open";
+    const command = Attributes.command;
     commands.addCommand(command, {
-      label: "DSDK Update",
-      caption: "DSDK Update",
+      label: Attributes.label,
+      caption: Attributes.caption,
       icon: (args: { [x: string]: any }) => {
         return args["isLauncher"] ? softwareUpdateIcon : undefined;
       },
@@ -42,8 +51,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
         if (!widget || widget.isDisposed) {
           const content = new SoftwareUpdateWidget(app, service);
           widget = new WebDSWidget<SoftwareUpdateWidget>({ content });
-          widget.id = "webds_software_update_widget";
-          widget.title.label = "DSDK Update";
+          widget.id = Attributes.id;
+          widget.title.label = Attributes.label;
           widget.title.icon = softwareUpdateIcon;
           widget.title.closable = true;
         }
@@ -59,13 +68,14 @@ const plugin: JupyterFrontEndPlugin<void> = {
     launcher.add({
       command,
       args: { isLauncher: true },
-      category: "WebDS"
+      category: Attributes.category,
+      rank: Attributes.rank
     });
 
     let tracker = new WidgetTracker<WebDSWidget>({
-      namespace: "webds_software_update"
+      namespace: Attributes.id
     });
-    restorer.restore(tracker, { command, name: () => "webds_software_update" });
+    restorer.restore(tracker, { command, name: () => Attributes.id });
   }
 };
 
