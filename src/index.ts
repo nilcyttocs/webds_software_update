@@ -49,7 +49,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
       },
       execute: () => {
         if (!widget || widget.isDisposed) {
-          const content = new SoftwareUpdateWidget(app, service);
+          const content = new SoftwareUpdateWidget(Attributes.id, app, service);
           widget = new WebDSWidget<SoftwareUpdateWidget>({ content });
           widget.id = Attributes.id;
           widget.title.label = Attributes.label;
@@ -62,6 +62,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
         if (!widget.isAttached) shell.add(widget, "main");
 
         shell.activateById(widget.id);
+
+        widget.setShadows();
       }
     });
 

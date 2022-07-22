@@ -80,16 +80,14 @@ const SoftwareUpdateContainer = (props: any): JSX.Element => {
       return;
     }
 
-    eventSource = new window.EventSource(
-      "/webds/software-update"
-    );
+    eventSource = new window.EventSource("/webds/software-update");
     eventSource.addEventListener("software-update", eventHandler, false);
     eventSource.addEventListener("error", errorHandler, false);
   };
 
   const updateOSInfo = () => {
     setOSInfo(props.service.pinormos.getOSInfo());
-  }
+  };
 
   const monitorUpdate = (): Promise<string> => {
     progressPromise = new Promise(function (resolve, reject) {
@@ -232,25 +230,28 @@ const SoftwareUpdateContainer = (props: any): JSX.Element => {
 };
 
 export class SoftwareUpdateWidget extends ReactWidget {
-  frontend: JupyterFrontEnd | null = null;
-  service: WebDSService | null = null;
+  id: string;
+  frontend: JupyterFrontEnd;
+  service: WebDSService;
 
-  constructor(
-    app: JupyterFrontEnd,
-    service: WebDSService,
-  ) {
+  constructor(id: string, app: JupyterFrontEnd, service: WebDSService) {
     super();
+    this.id = id;
     this.frontend = app;
     this.service = service;
   }
 
   render(): JSX.Element {
     return (
-      <div className="jp-webds-widget">
-        <SoftwareUpdateContainer
-          frontend={this.frontend}
-          service={this.service}
-        />
+      <div id={this.id + "_container"} className="jp-webds-widget-container">
+        <div id={this.id + "_content"} className="jp-webds-widget">
+          <SoftwareUpdateContainer
+            frontend={this.frontend}
+            service={this.service}
+          />
+        </div>
+        <div className="jp-webds-widget-shadow jp-webds-widget-shadow-top"></div>
+        <div className="jp-webds-widget-shadow jp-webds-widget-shadow-bottom"></div>
       </div>
     );
   }
