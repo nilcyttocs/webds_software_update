@@ -19,8 +19,8 @@ namespace Attributes {
   export const id = "webds_software_update_widget";
   export const label = "DSDK Update";
   export const caption = "DSDK Update";
-  export const category = "DSDK - Application";
-  export const rank = 30;
+  export const category = "DSDK - Applications";
+  export const rank = 40;
 }
 
 /**
