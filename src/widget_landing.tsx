@@ -2,123 +2,33 @@ import React, { useState } from "react";
 
 import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
-import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
-import LinearProgress from "@mui/material/LinearProgress";
 import ArticleRoundedIcon from "@mui/icons-material/ArticleRounded";
 
-import { Page } from "./widget_container";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 const WIDTH = 800;
 const HEIGHT_TITLE = 70;
 const HEIGHT_CONTENT = 200;
-const HEIGHT_CONTROLS = 100;
+const HEIGHT_CONTROLS = 120;
 
 const showHelp = false;
 
-let alertMessage = "";
-const alertMessageDownloadTarball = "Failed to download tarball from server.";
-const alertMessageDownloadManifest = "Failed to download manifest from server.";
-
 export const Landing = (props: any): JSX.Element => {
-  const [alert, setAlert] = useState<boolean>(false);
-  const [snackbar, setSnackbar] = useState<boolean>(false);
-  const [updating, setUpdating] = useState<boolean>(false);
-  const [progress, setProgress] = useState<string>("");
+  const [openDialog, setOpenDialog] = useState(false);
 
-  const doUpdate = async () => {
-    setUpdating(true);
-
-    let tarballFile: File;
-    let manifestFile: File;
-
-    if (!props.tarball) {
-      setProgress("Downloading Tarball from Server");
-      const requestHeaders: HeadersInit = new Headers();
-      requestHeaders.set("Content-Type", "application/x-tgz");
-
-      let request = new Request(props.osInfo.repo.tarball, {
-        method: "GET",
-        mode: "cors",
-        headers: requestHeaders,
-        referrerPolicy: "no-referrer"
-      });
-      let response: Response;
-      try {
-        response = await fetch(request);
-      } catch (error) {
-        console.error(`Error - GET ${props.osInfo.repo.tarball}\n${error}`);
-        alertMessage = alertMessageDownloadTarball;
-        setAlert(true);
-        setProgress("");
-        setUpdating(false);
-        return;
-      }
-      const tarballBlob = await response.blob();
-      let tarballName = props.osInfo.repo.tarball.split("/");
-      tarballName = tarballName[tarballName.length - 1];
-      tarballFile = new File([tarballBlob], tarballName);
-      console.log(tarballFile);
-
-      request = new Request(props.osInfo.repo.manifest, {
-        method: "GET",
-        mode: "cors",
-        headers: requestHeaders,
-        referrerPolicy: "no-referrer"
-      });
-      try {
-        response = await fetch(request);
-      } catch (error) {
-        console.error(`Error - GET ${props.osInfo.repo.manifest}\n${error}`);
-        alertMessage = alertMessageDownloadManifest;
-        setAlert(true);
-        setProgress("");
-        setUpdating(false);
-        return;
-      }
-      const manifestBlob = await response.blob();
-      let manifestName = props.osInfo.repo.manifest.split("/");
-      manifestName = manifestName[manifestName.length - 1];
-      manifestFile = new File([manifestBlob], manifestName);
-      console.log(manifestFile);
-
-      props.setTarball({
-        tarball: tarballFile,
-        manifest: manifestFile
-      });
-    } else {
-      tarballFile = props.tarball.tarball;
-      manifestFile = props.tarball.manifest;
-    }
-
-    try {
-      setProgress("Transferring Tarball Files to Dropbox");
-      await props.uploadTarball(tarballFile, manifestFile);
-      setProgress("Performing Update");
-      await props.monitorUpdate();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setProgress("");
-      setUpdating(false);
-      props.updateOSInfo();
-    }
+  const handleDialogClose = () => {
+    setOpenDialog(false);
   };
 
   return (
     <>
-      {alert && (
-        <Alert
-          severity="error"
-          onClose={() => setAlert(false)}
-          sx={{ marginBottom: "16px", whiteSpace: "pre-wrap" }}
-        >
-          {alertMessage}
-        </Alert>
-      )}
       <Stack spacing={2}>
         <Box
           sx={{
@@ -167,7 +77,8 @@ export const Landing = (props: any): JSX.Element => {
             justifyContent: "center"
           }}
         >
-          {props.osInfo.current.version >= props.osInfo.repo.version ? (
+          {props.osInfo.current.version >= props.osInfo.repo.version ||
+          !props.osInfo.repo.downloaded ? (
             <Typography
               variant="h4"
               sx={{
@@ -177,20 +88,6 @@ export const Landing = (props: any): JSX.Element => {
             >
               No Update Available
             </Typography>
-          ) : updating ? (
-            <div
-              style={{
-                margin: "24px"
-              }}
-            >
-              <Typography variant="h5">
-                {progress +
-                  (props.updateStatus === ""
-                    ? props.updateStatus
-                    : ` (${props.updateStatus})`)}
-              </Typography>
-              <LinearProgress />
-            </div>
           ) : (
             <Typography
               variant="h4"
@@ -222,15 +119,14 @@ export const Landing = (props: any): JSX.Element => {
             <Button
               disabled={
                 props.osInfo.current.version >= props.osInfo.repo.version ||
-                updating
+                !props.osInfo.repo.downloaded
               }
               onClick={async () => {
-                setSnackbar(true);
-                await doUpdate();
+                setOpenDialog(true);
               }}
-              sx={{ width: "200px" }}
+              sx={{ width: "150px" }}
             >
-              Update
+              Install
             </Button>
           </div>
           <Fab
@@ -239,44 +135,34 @@ export const Landing = (props: any): JSX.Element => {
               position: "absolute",
               top: "50%",
               right: "24px",
-              transform: "translate(0%, -50%)"
+              transform: "translate(0%, -50%)",
+              display: "none"
             }}
           >
             <ArticleRoundedIcon />
           </Fab>
-          <Button
-            variant="text"
-            disabled={updating}
-            onClick={(event) => {
-              if (event.detail < 3) {
-                return;
-              }
-              props.changePage(Page.Manual);
-            }}
-            sx={{
-              position: "absolute",
-              bottom: "0px",
-              left: "0px",
-              cursor: "default",
-              "&:hover": {
-                backgroundColor: "transparent"
-              }
-            }}
-          >
-            <Typography></Typography>
-          </Button>
         </Box>
       </Stack>
-      <Snackbar
-        open={snackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        autoHideDuration={10000}
-        onClose={() => setSnackbar(false)}
-      >
-        <Alert severity="info" onClose={() => setSnackbar(false)}>
-          Update in progress. This may take several minutes to complete.
-        </Alert>
-      </Snackbar>
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle>
+          Install PinormOS Version {props.osInfo.repo.version}?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Click Okay to reboot the DSDK and install PinormOS version{" "}
+            {props.osInfo.repo.version}. The installation process may take
+            several minutes to complete.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} sx={{ width: "100px" }}>
+            Cancel
+          </Button>
+          <Button onClick={handleDialogClose} sx={{ width: "100px" }}>
+            Okay
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
