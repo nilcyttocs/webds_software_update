@@ -151,7 +151,8 @@ export const Landing = (props: any): JSX.Element => {
           <DialogContentText>
             Click Okay to reboot the DSDK and install PinormOS version{" "}
             {props.osInfo.repo.version}. The installation process may take
-            several minutes to complete.
+            several minutes to complete. During installation, ADB connection to
+            the DSDK may be unavailable.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
