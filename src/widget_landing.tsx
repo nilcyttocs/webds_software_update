@@ -126,7 +126,7 @@ export const Landing = (props: any): JSX.Element => {
               }}
               sx={{ width: "150px" }}
             >
-              Install
+              Install Now
             </Button>
           </div>
           <Fab
