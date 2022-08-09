@@ -13,6 +13,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
+import { requestAPI } from "./handler";
+
 const WIDTH = 800;
 const HEIGHT_TITLE = 70;
 const HEIGHT_CONTENT = 200;
@@ -20,11 +22,49 @@ const HEIGHT_CONTROLS = 120;
 
 const showHelp = false;
 
+const sendSystemRebootRequest = async () => {
+  let uuid: string;
+  let dataToSend: any = {
+    command: {
+      action: "reset",
+      target: "rpi4"
+    }
+  };
+  try {
+    uuid = await requestAPI<any>("general", {
+      body: JSON.stringify(dataToSend),
+      method: "POST"
+    });
+  } catch (error) {
+    console.error(`Error - POST /webds/general\n${dataToSend}\n${error}`);
+    return Promise.reject("Failed to reboot system");
+  }
+  dataToSend.command.uuid = uuid;
+  try {
+    await requestAPI<any>("general", {
+      body: JSON.stringify(dataToSend),
+      method: "POST"
+    });
+  } catch (error) {
+    console.error(`Error - POST /webds/general\n${dataToSend}\n${error}`);
+    return Promise.reject("Failed to reboot system");
+  }
+};
+
 export const Landing = (props: any): JSX.Element => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleDialogClose = () => {
     setOpenDialog(false);
+  };
+
+  const handleOkayButton = async () => {
+    try {
+      await sendSystemRebootRequest();
+    } catch (error) {
+      console.error(error);
+    }
+    handleDialogClose();
   };
 
   return (
@@ -159,7 +199,7 @@ export const Landing = (props: any): JSX.Element => {
           <Button onClick={handleDialogClose} sx={{ width: "100px" }}>
             Cancel
           </Button>
-          <Button onClick={handleDialogClose} sx={{ width: "100px" }}>
+          <Button onClick={handleOkayButton} sx={{ width: "100px" }}>
             Okay
           </Button>
         </DialogActions>
