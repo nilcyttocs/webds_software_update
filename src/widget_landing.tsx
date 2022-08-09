@@ -23,15 +23,15 @@ const HEIGHT_CONTROLS = 120;
 const showHelp = false;
 
 const sendSystemRebootRequest = async () => {
-  let uuid: string;
+  let token: string;
   let dataToSend: any = {
     command: {
-      action: "reset",
+      action: "reboot",
       target: "rpi4"
     }
   };
   try {
-    uuid = await requestAPI<any>("general", {
+    token = await requestAPI<any>("general", {
       body: JSON.stringify(dataToSend),
       method: "POST"
     });
@@ -39,7 +39,7 @@ const sendSystemRebootRequest = async () => {
     console.error(`Error - POST /webds/general\n${dataToSend}\n${error}`);
     return Promise.reject("Failed to reboot system");
   }
-  dataToSend.command.uuid = uuid;
+  dataToSend.command.token = token;
   try {
     await requestAPI<any>("general", {
       body: JSON.stringify(dataToSend),
