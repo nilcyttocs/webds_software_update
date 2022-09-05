@@ -108,6 +108,8 @@ export class SoftwareUpdateWidget extends ReactWidget {
             service={this.service}
           />
         </div>
+        <div className="jp-webds-widget-shadow jp-webds-widget-shadow-top"></div>
+        <div className="jp-webds-widget-shadow jp-webds-widget-shadow-bottom"></div>
       </div>
     );
   }
