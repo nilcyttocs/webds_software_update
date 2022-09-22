@@ -30,13 +30,15 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: "@webds/software_update:plugin",
   autoStart: true,
   requires: [ILauncher, ILayoutRestorer, WebDSService],
-  activate: (
+  activate: async (
     app: JupyterFrontEnd,
     launcher: ILauncher,
     restorer: ILayoutRestorer,
     service: WebDSService
   ) => {
     console.log("JupyterLab extension @webds/software_update is activated!");
+
+    await service.initialized;
 
     let widget: WebDSWidget;
     const { commands, shell } = app;
