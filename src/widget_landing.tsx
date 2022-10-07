@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
@@ -52,6 +52,7 @@ const sendSystemRebootRequest = async () => {
 };
 
 export const Landing = (props: any): JSX.Element => {
+  const [installing, setInstalling] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleDialogClose = () => {
@@ -59,13 +60,21 @@ export const Landing = (props: any): JSX.Element => {
   };
 
   const handleOkayButton = async () => {
-    try {
-      await sendSystemRebootRequest();
-    } catch (error) {
-      console.error(error);
-    }
+    setInstalling(true);
     handleDialogClose();
   };
+
+  useEffect(() => {
+    if (installing) {
+      setTimeout(async () => {
+        try {
+          await sendSystemRebootRequest();
+        } catch (error) {
+          console.error(error);
+        }
+      }, 100);
+    }
+  }, [installing]);
 
   return (
     <>
@@ -159,14 +168,15 @@ export const Landing = (props: any): JSX.Element => {
             <Button
               disabled={
                 props.osInfo.current.version >= props.osInfo.repo.version ||
-                !props.osInfo.repo.downloaded
+                !props.osInfo.repo.downloaded ||
+                installing
               }
               onClick={async () => {
                 setOpenDialog(true);
               }}
               sx={{ width: "150px" }}
             >
-              Install Now
+              {installing ? "Installing..." : "Install Now"}
             </Button>
           </div>
           <Fab
