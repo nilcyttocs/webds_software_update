@@ -1,24 +1,20 @@
 import React, { useEffect, useState } from "react";
 
-import { JupyterFrontEnd } from "@jupyterlab/application";
-
-import { ReactWidget } from "@jupyterlab/apputils";
-
 import Alert from "@mui/material/Alert";
 
 import CircularProgress from "@mui/material/CircularProgress";
 
 import { ThemeProvider } from "@mui/material/styles";
 
-import { OSInfo, WebDSService } from "@webds/service";
+import { OSInfo } from "@webds/service";
 
-import { Landing } from "./widget_landing";
+import Landing from "./Landing";
 
 const logLocation = "Synaptics/_links/Update_Daemon_Log";
 
 let alertMessage = "";
 
-const SoftwareUpdateContainer = (props: any): JSX.Element => {
+export const SoftwareUpdateComponent = (props: any): JSX.Element => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [alert, setAlert] = useState<boolean>(false);
   const [osInfo, setOSInfo] = useState<OSInfo | null>(null);
@@ -86,30 +82,4 @@ const SoftwareUpdateContainer = (props: any): JSX.Element => {
   );
 };
 
-export class SoftwareUpdateWidget extends ReactWidget {
-  id: string;
-  frontend: JupyterFrontEnd;
-  service: WebDSService;
-
-  constructor(id: string, app: JupyterFrontEnd, service: WebDSService) {
-    super();
-    this.id = id;
-    this.frontend = app;
-    this.service = service;
-  }
-
-  render(): JSX.Element {
-    return (
-      <div id={this.id + "_container"} className="jp-webds-widget-container">
-        <div id={this.id + "_content"} className="jp-webds-widget">
-          <SoftwareUpdateContainer
-            frontend={this.frontend}
-            service={this.service}
-          />
-        </div>
-        <div className="jp-webds-widget-shadow jp-webds-widget-shadow-top"></div>
-        <div className="jp-webds-widget-shadow jp-webds-widget-shadow-bottom"></div>
-      </div>
-    );
-  }
-}
+export default SoftwareUpdateComponent;

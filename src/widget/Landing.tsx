@@ -13,7 +13,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-import { requestAPI } from "./handler";
+import { requestAPI } from "../handler";
 
 const WIDTH = 800;
 const HEIGHT_TITLE = 70;
@@ -217,3 +217,5 @@ export const Landing = (props: any): JSX.Element => {
     </>
   );
 };
+
+export default Landing;

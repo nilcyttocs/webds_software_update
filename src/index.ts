@@ -12,7 +12,7 @@ import { WebDSService, WebDSWidget } from "@webds/service";
 
 import { softwareUpdateIcon } from "./icons";
 
-import { SoftwareUpdateWidget } from "./widget_container";
+import SoftwareUpdateWidget from "./widget/SoftwareUpdateWidget";
 
 namespace Attributes {
   export const command = "webds_software_update:open";
