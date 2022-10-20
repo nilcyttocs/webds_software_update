@@ -202,7 +202,9 @@ export const Landing = (props: any): JSX.Element => {
             Click Okay to reboot the DSDK and install PinormOS version{" "}
             {props.osInfo.repo.version}. The installation process may take
             several minutes to complete. During installation, ADB connection to
-            the DSDK may be unavailable.
+            the DSDK may be unavailable and you may wish to close WebDS during
+            this time. Once ADB connection has been re-established, you can then
+            do ADB port forwarding and re-open WebDS.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
