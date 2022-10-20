@@ -14,15 +14,34 @@ const logLocation = "Synaptics/_links/Update_Daemon_Log";
 
 let alertMessage = "";
 
+let repo: any;
+let timerID: number | null = null;
+
+function useForceUpdate() {
+  const [render, setRender] = useState<boolean>(false);
+  return () => setRender(!render);
+}
+
 export const SoftwareUpdateComponent = (props: any): JSX.Element => {
   const [initialized, setInitialized] = useState<boolean>(false);
   const [alert, setAlert] = useState<boolean>(false);
-  const [osInfo, setOSInfo] = useState<OSInfo | null>(null);
+  const [osInfo, setOSInfo] = useState<OSInfo>();
 
   const { commands, shell } = props.frontend;
 
-  const updateOSInfo = () => {
-    setOSInfo(props.service.pinormos.getOSInfo());
+  const forceUpdate = useForceUpdate();
+
+  const pollOSInfo = () => {
+    let doForceUpdate = false;
+    const info = props.service.pinormos.getOSInfo();
+    if (repo && JSON.stringify(info.repo) !== JSON.stringify(repo)) {
+      doForceUpdate = true;
+    }
+    repo = Object.assign({}, info.repo);
+    setOSInfo(info);
+    if (doForceUpdate) {
+      forceUpdate();
+    }
   };
 
   const showLog = async () => {
@@ -41,11 +60,19 @@ export const SoftwareUpdateComponent = (props: any): JSX.Element => {
   };
 
   useEffect(() => {
-    const initialize = async () => {
-      updateOSInfo();
+    const initialize = () => {
+      pollOSInfo();
+      timerID = setInterval(pollOSInfo, 2000);
       setInitialized(true);
     };
     initialize();
+    return () => {
+      repo = null;
+      if (timerID) {
+        clearInterval(timerID);
+        timerID = null;
+      }
+    };
   }, []);
 
   const webdsTheme = props.service.ui.getWebDSTheme();
