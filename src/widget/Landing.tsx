@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
-import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import ArticleRoundedIcon from "@mui/icons-material/ArticleRounded";
@@ -13,14 +11,11 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
+import { Canvas } from "./mui_extensions/Canvas";
+import { Content } from "./mui_extensions/Content";
+import { Controls } from "./mui_extensions/Controls";
+
 import { requestAPI } from "../handler";
-
-const WIDTH = 800;
-const HEIGHT_TITLE = 70;
-const HEIGHT_CONTENT = 200;
-const HEIGHT_CONTROLS = 120;
-
-const showHelp = false;
 
 const sendSystemRebootRequest = async () => {
   let token: string;
@@ -78,46 +73,9 @@ export const Landing = (props: any): JSX.Element => {
 
   return (
     <>
-      <Stack spacing={2}>
-        <Box
+      <Canvas title="DSDK Update">
+        <Content
           sx={{
-            width: WIDTH + "px",
-            height: HEIGHT_TITLE + "px",
-            position: "relative",
-            bgcolor: "section.background"
-          }}
-        >
-          <Typography
-            variant="h5"
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)"
-            }}
-          >
-            DSDK Update
-          </Typography>
-          {showHelp && (
-            <Button
-              variant="text"
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "16px",
-                transform: "translate(0%, -50%)"
-              }}
-            >
-              <Typography variant="underline">Help</Typography>
-            </Button>
-          )}
-        </Box>
-        <Box
-          sx={{
-            width: WIDTH + "px",
-            minHeight: HEIGHT_CONTENT + "px",
-            position: "relative",
-            bgcolor: "section.background",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -145,13 +103,9 @@ export const Landing = (props: any): JSX.Element => {
               Version {props.osInfo.repo.version} Available
             </Typography>
           )}
-        </Box>
-        <Box
+        </Content>
+        <Controls
           sx={{
-            width: WIDTH + "px",
-            minHeight: HEIGHT_CONTROLS + "px",
-            position: "relative",
-            bgcolor: "section.background",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -189,8 +143,8 @@ export const Landing = (props: any): JSX.Element => {
           >
             <ArticleRoundedIcon />
           </Fab>
-        </Box>
-      </Stack>
+        </Controls>
+      </Canvas>
       <Dialog open={openDialog} onClose={handleDialogClose}>
         <DialogTitle>
           Install PinormOS Version {props.osInfo.repo.version}?
