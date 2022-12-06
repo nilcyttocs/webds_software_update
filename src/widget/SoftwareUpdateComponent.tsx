@@ -10,7 +10,7 @@ import { OSInfo } from "@webds/service";
 
 import Landing from "./Landing";
 
-const logLocation = "Synaptics/_links/Update_Daemon_Log";
+const LOG_LOCATION = "Synaptics/_links/Update_Daemon_Log";
 
 let alertMessage = "";
 
@@ -47,7 +47,7 @@ export const SoftwareUpdateComponent = (props: any): JSX.Element => {
   const showLog = async () => {
     commands
       .execute("docmanager:open", {
-        path: logLocation,
+        path: LOG_LOCATION,
         factory: "Editor",
         options: { mode: "split-right" }
       })
