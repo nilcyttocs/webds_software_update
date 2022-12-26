@@ -10,6 +10,8 @@ import { OSInfo } from "@webds/service";
 
 import Landing from "./Landing";
 
+import { webdsService } from "./local_exports";
+
 const LOG_LOCATION = "Synaptics/_links/Update_Daemon_Log";
 
 let alertMessage = "";
@@ -27,13 +29,15 @@ export const SoftwareUpdateComponent = (props: any): JSX.Element => {
   const [alert, setAlert] = useState<boolean>(false);
   const [osInfo, setOSInfo] = useState<OSInfo>();
 
+  const webdsTheme = webdsService.ui.getWebDSTheme();
+
   const { commands, shell } = props.frontend;
 
   const forceUpdate = useForceUpdate();
 
   const pollOSInfo = () => {
     let doForceUpdate = false;
-    const info = props.service.pinormos.getOSInfo();
+    const info = webdsService.pinormos.getOSInfo();
     if (repo && JSON.stringify(info.repo) !== JSON.stringify(repo)) {
       doForceUpdate = true;
     }
@@ -74,8 +78,6 @@ export const SoftwareUpdateComponent = (props: any): JSX.Element => {
       }
     };
   }, []);
-
-  const webdsTheme = props.service.ui.getWebDSTheme();
 
   return (
     <>

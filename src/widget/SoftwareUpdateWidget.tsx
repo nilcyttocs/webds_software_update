@@ -8,6 +8,8 @@ import { WebDSService } from "@webds/service";
 
 import SoftwareUpdateComponent from "./SoftwareUpdateComponent";
 
+export let webdsService: WebDSService;
+
 export class SoftwareUpdateWidget extends ReactWidget {
   id: string;
   frontend: JupyterFrontEnd;
@@ -21,12 +23,10 @@ export class SoftwareUpdateWidget extends ReactWidget {
   }
 
   render(): JSX.Element {
+    webdsService = this.service;
     return (
       <div id={this.id + "_component"}>
-        <SoftwareUpdateComponent
-          frontend={this.frontend}
-          service={this.service}
-        />
+        <SoftwareUpdateComponent frontend={this.frontend} />
       </div>
     );
   }
