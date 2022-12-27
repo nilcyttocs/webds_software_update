@@ -25,6 +25,8 @@ namespace Attributes {
 
 export let webdsService: WebDSService;
 
+export let frontend: JupyterFrontEnd;
+
 /**
  * Initialization data for the @webds/software_update extension.
  */
@@ -42,6 +44,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
     webdsService = service;
 
+    frontend = app;
+
     let widget: WebDSWidget;
     const { commands, shell } = app;
     const command = Attributes.command;
@@ -53,7 +57,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
       },
       execute: () => {
         if (!widget || widget.isDisposed) {
-          const content = new SoftwareUpdateWidget(Attributes.id, app);
+          const content = new SoftwareUpdateWidget(Attributes.id);
           widget = new WebDSWidget<SoftwareUpdateWidget>({ content });
           widget.id = Attributes.id;
           widget.title.label = Attributes.label;

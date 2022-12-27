@@ -10,7 +10,7 @@ import { OSInfo } from "@webds/service";
 
 import Landing from "./Landing";
 
-import { webdsService } from "./local_exports";
+import { frontend, webdsService } from "./local_exports";
 
 const LOG_LOCATION = "Synaptics/_links/Update_Daemon_Log";
 
@@ -31,7 +31,7 @@ export const SoftwareUpdateComponent = (props: any): JSX.Element => {
 
   const webdsTheme = webdsService.ui.getWebDSTheme();
 
-  const { commands, shell } = props.frontend;
+  const { commands, shell } = frontend;
 
   const forceUpdate = useForceUpdate();
 
