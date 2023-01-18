@@ -2,24 +2,20 @@ import {
   ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin
-} from "@jupyterlab/application";
+} from '@jupyterlab/application';
+import { WidgetTracker } from '@jupyterlab/apputils';
+import { ILauncher } from '@jupyterlab/launcher';
+import { WebDSService, WebDSWidget } from '@webds/service';
 
-import { WidgetTracker } from "@jupyterlab/apputils";
-
-import { ILauncher } from "@jupyterlab/launcher";
-
-import { WebDSService, WebDSWidget } from "@webds/service";
-
-import { softwareUpdateIcon } from "./icons";
-
-import SoftwareUpdateWidget from "./widget/SoftwareUpdateWidget";
+import { softwareUpdateIcon } from './icons';
+import SoftwareUpdateWidget from './widget/SoftwareUpdateWidget';
 
 namespace Attributes {
-  export const command = "webds_software_update:open";
-  export const id = "webds_software_update_widget";
-  export const label = "DSDK Update";
-  export const caption = "DSDK Update";
-  export const category = "DSDK - Applications";
+  export const command = 'webds_software_update:open';
+  export const id = 'webds_software_update_widget';
+  export const label = 'DSDK Update';
+  export const caption = 'DSDK Update';
+  export const category = 'DSDK - Applications';
   export const rank = 40;
 }
 
@@ -31,7 +27,7 @@ export let frontend: JupyterFrontEnd;
  * Initialization data for the @webds/software_update extension.
  */
 const plugin: JupyterFrontEndPlugin<void> = {
-  id: "@webds/software_update:plugin",
+  id: '@webds/software_update:plugin',
   autoStart: true,
   requires: [ILauncher, ILayoutRestorer, WebDSService],
   activate: (
@@ -40,7 +36,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     restorer: ILayoutRestorer,
     service: WebDSService
   ) => {
-    console.log("JupyterLab extension @webds/software_update is activated!");
+    console.log('JupyterLab extension @webds/software_update is activated!');
 
     webdsService = service;
 
@@ -53,7 +49,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
       label: Attributes.label,
       caption: Attributes.caption,
       icon: (args: { [x: string]: any }) => {
-        return args["isLauncher"] ? softwareUpdateIcon : undefined;
+        return args['isLauncher'] ? softwareUpdateIcon : undefined;
       },
       execute: () => {
         if (!widget || widget.isDisposed) {
@@ -67,7 +63,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
         if (!tracker.has(widget)) tracker.add(widget);
 
-        if (!widget.isAttached) shell.add(widget, "main");
+        if (!widget.isAttached) shell.add(widget, 'main');
 
         shell.activateById(widget.id);
       }

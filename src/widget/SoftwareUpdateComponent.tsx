@@ -1,20 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import Alert from "@mui/material/Alert";
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import { ThemeProvider } from '@mui/material/styles';
+import { OSInfo } from '@webds/service';
 
-import CircularProgress from "@mui/material/CircularProgress";
+import Landing from './Landing';
+import { frontend, webdsService } from './local_exports';
 
-import { ThemeProvider } from "@mui/material/styles";
+const LOG_LOCATION = 'Synaptics/_links/Update_Daemon_Log';
 
-import { OSInfo } from "@webds/service";
-
-import Landing from "./Landing";
-
-import { frontend, webdsService } from "./local_exports";
-
-const LOG_LOCATION = "Synaptics/_links/Update_Daemon_Log";
-
-let alertMessage = "";
+let alertMessage = '';
 
 let repo: any;
 let timerID: number | null = null;
@@ -50,15 +46,15 @@ export const SoftwareUpdateComponent = (props: any): JSX.Element => {
 
   const showLog = async () => {
     commands
-      .execute("docmanager:open", {
+      .execute('docmanager:open', {
         path: LOG_LOCATION,
-        factory: "Editor",
-        options: { mode: "split-right" }
+        factory: 'Editor',
+        options: { mode: 'split-right' }
       })
       .then((widget: any) => {
-        widget.id = "update_daemon_log";
+        widget.id = 'update_daemon_log';
         widget.title.closable = true;
-        if (!widget.isAttached) shell.add(widget, "main");
+        if (!widget.isAttached) shell.add(widget, 'main');
         shell.activateById(widget.id);
       });
   };
@@ -87,7 +83,7 @@ export const SoftwareUpdateComponent = (props: any): JSX.Element => {
             <Alert
               severity="error"
               onClose={() => setAlert(false)}
-              sx={{ whiteSpace: "pre-wrap" }}
+              sx={{ whiteSpace: 'pre-wrap' }}
             >
               {alertMessage}
             </Alert>
@@ -97,10 +93,10 @@ export const SoftwareUpdateComponent = (props: any): JSX.Element => {
         {!initialized && (
           <div
             style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)"
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)'
             }}
           >
             <CircularProgress color="primary" />

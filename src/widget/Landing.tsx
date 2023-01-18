@@ -1,48 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import Fab from "@mui/material/Fab";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import ArticleRoundedIcon from "@mui/icons-material/ArticleRounded";
+import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Fab from '@mui/material/Fab';
+import Typography from '@mui/material/Typography';
 
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-
-import { Canvas } from "./mui_extensions/Canvas";
-import { Content } from "./mui_extensions/Content";
-import { Controls } from "./mui_extensions/Controls";
-
-import { requestAPI } from "./local_exports";
+import { requestAPI } from './local_exports';
+import { Canvas } from './mui_extensions/Canvas';
+import { Content } from './mui_extensions/Content';
+import { Controls } from './mui_extensions/Controls';
 
 const sendSystemRebootRequest = async () => {
   let token: string;
   let dataToSend: any = {
     command: {
-      action: "reboot",
-      target: "rpi4"
+      action: 'reboot',
+      target: 'rpi4'
     }
   };
   try {
-    token = await requestAPI<any>("general", {
+    token = await requestAPI<any>('general', {
       body: JSON.stringify(dataToSend),
-      method: "POST"
+      method: 'POST'
     });
   } catch (error) {
     console.error(`Error - POST /webds/general\n${dataToSend}\n${error}`);
-    return Promise.reject("Failed to reboot system");
+    return Promise.reject('Failed to reboot system');
   }
   dataToSend.command.token = token;
   try {
-    await requestAPI<any>("general", {
+    await requestAPI<any>('general', {
       body: JSON.stringify(dataToSend),
-      method: "POST"
+      method: 'POST'
     });
   } catch (error) {
     console.error(`Error - POST /webds/general\n${dataToSend}\n${error}`);
-    return Promise.reject("Failed to reboot system");
+    return Promise.reject('Failed to reboot system');
   }
 };
 
@@ -76,10 +74,10 @@ export const Landing = (props: any): JSX.Element => {
       <Canvas title="DSDK Update">
         <Content
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center"
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
           {props.osInfo.current.version >= props.osInfo.repo.version ||
@@ -87,8 +85,8 @@ export const Landing = (props: any): JSX.Element => {
             <Typography
               variant="h4"
               sx={{
-                margin: "24px",
-                color: (theme) => theme.palette.text.disabled
+                margin: '24px',
+                color: theme => theme.palette.text.disabled
               }}
             >
               No Update Available
@@ -97,7 +95,7 @@ export const Landing = (props: any): JSX.Element => {
             <Typography
               variant="h4"
               sx={{
-                margin: "24px"
+                margin: '24px'
               }}
             >
               Version {props.osInfo.repo.version} Available
@@ -106,15 +104,15 @@ export const Landing = (props: any): JSX.Element => {
         </Content>
         <Controls
           sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center"
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
           <div
             style={{
-              margin: "24px"
+              margin: '24px'
             }}
           >
             <Button
@@ -126,19 +124,19 @@ export const Landing = (props: any): JSX.Element => {
               onClick={async () => {
                 setOpenDialog(true);
               }}
-              sx={{ width: "150px" }}
+              sx={{ width: '150px' }}
             >
-              {installing ? "Installing..." : "Install Now"}
+              {installing ? 'Installing...' : 'Install Now'}
             </Button>
           </div>
           <Fab
             onClick={props.showLog}
             sx={{
-              position: "absolute",
-              top: "50%",
-              right: "24px",
-              transform: "translate(0%, -50%)",
-              display: "none"
+              position: 'absolute',
+              top: '50%',
+              right: '24px',
+              transform: 'translate(0%, -50%)',
+              display: 'none'
             }}
           >
             <ArticleRoundedIcon />
@@ -151,7 +149,7 @@ export const Landing = (props: any): JSX.Element => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Click Okay to reboot the DSDK and install PinormOS version{" "}
+            Click Okay to reboot the DSDK and install PinormOS version{' '}
             {props.osInfo.repo.version}. The installation process may take
             several minutes to complete. During installation, ADB connection to
             the DSDK may be unavailable and you may wish to close WebDS during
@@ -160,10 +158,10 @@ export const Landing = (props: any): JSX.Element => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} sx={{ width: "100px" }}>
+          <Button onClick={handleDialogClose} sx={{ width: '100px' }}>
             Cancel
           </Button>
-          <Button onClick={handleOkayButton} sx={{ width: "100px" }}>
+          <Button onClick={handleOkayButton} sx={{ width: '100px' }}>
             Okay
           </Button>
         </DialogActions>
