@@ -10,8 +10,6 @@ import { frontend, webdsService } from './local_exports';
 
 const LOG_LOCATION = 'Synaptics/_links/Update_Daemon_Log';
 
-let alertMessage = '';
-
 let repo: any;
 let timerID: number | null = null;
 
@@ -22,7 +20,7 @@ function useForceUpdate() {
 
 export const SoftwareUpdateComponent = (props: any): JSX.Element => {
   const [initialized, setInitialized] = useState<boolean>(false);
-  const [alert, setAlert] = useState<boolean>(false);
+  const [alert, setAlert] = useState<string | undefined>(undefined);
   const [osInfo, setOSInfo] = useState<OSInfo>();
 
   const webdsTheme = webdsService.ui.getWebDSTheme();
@@ -79,16 +77,17 @@ export const SoftwareUpdateComponent = (props: any): JSX.Element => {
     <>
       <ThemeProvider theme={webdsTheme}>
         <div className="jp-webds-widget-body">
-          {alert && (
+          {alert !== undefined && (
             <Alert
               severity="error"
-              onClose={() => setAlert(false)}
-              sx={{ whiteSpace: 'pre-wrap' }}
-            >
-              {alertMessage}
+              onClose={() => setAlert(undefined)}
+              sx={{ whiteSpace: 'pre-wrap' }}>
+              {alert}
             </Alert>
           )}
-          {initialized && <Landing osInfo={osInfo} showLog={showLog} />}
+          {initialized && (
+            <Landing setAlert={setAlert} osInfo={osInfo} showLog={showLog} />
+          )}
         </div>
         {!initialized && (
           <div
@@ -97,8 +96,7 @@ export const SoftwareUpdateComponent = (props: any): JSX.Element => {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)'
-            }}
-          >
+            }}>
             <CircularProgress color="primary" />
           </div>
         )}

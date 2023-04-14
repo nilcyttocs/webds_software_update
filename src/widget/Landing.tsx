@@ -8,9 +8,11 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Fab from '@mui/material/Fab';
+import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 
-import { requestAPI } from './local_exports';
+import { ALERT_MESSAGE_DOWNLOAD_TARBALL } from './constants';
+import { requestAPI, webdsService } from './local_exports';
 import { Canvas } from './mui_extensions/Canvas';
 import { Content } from './mui_extensions/Content';
 import { Controls } from './mui_extensions/Controls';
@@ -46,6 +48,7 @@ const sendSystemRebootRequest = async () => {
 
 export const Landing = (props: any): JSX.Element => {
   const [installing, setInstalling] = useState(false);
+  const [downloaded, setDownloaded] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleDialogClose = () => {
@@ -55,10 +58,18 @@ export const Landing = (props: any): JSX.Element => {
   const handleOkayButton = async () => {
     setInstalling(true);
     handleDialogClose();
+    try {
+      await webdsService.pinormos.downloadTarball();
+      setDownloaded(true);
+    } catch (error) {
+      console.log(error);
+      props.setAlert(ALERT_MESSAGE_DOWNLOAD_TARBALL);
+      setInstalling(false);
+    }
   };
 
   useEffect(() => {
-    if (installing) {
+    if (downloaded) {
       setTimeout(async () => {
         try {
           await sendSystemRebootRequest();
@@ -67,7 +78,7 @@ export const Landing = (props: any): JSX.Element => {
         }
       }, 100);
     }
-  }, [installing]);
+  }, [downloaded]);
 
   return (
     <>
@@ -80,24 +91,31 @@ export const Landing = (props: any): JSX.Element => {
             justifyContent: 'center'
           }}
         >
-          {props.osInfo.current.version >= props.osInfo.repo.version ||
-          !props.osInfo.repo.downloaded ? (
+          {props.osInfo.current.version >= props.osInfo.repo.version ? (
             <Typography
               variant="h4"
               sx={{
-                margin: '24px',
                 color: theme => theme.palette.text.disabled
               }}
             >
               No Update Available
             </Typography>
+          ) : downloaded ? (
+            <Typography variant="h4">Rebooting DSDK...</Typography>
+          ) : installing ? (
+            <div>
+              <Typography
+                variant="h4"
+                sx={{
+                  marginBottom: '8px'
+                }}
+              >
+                Downloading Version {props.osInfo.repo.version}...
+              </Typography>
+              <LinearProgress />
+            </div>
           ) : (
-            <Typography
-              variant="h4"
-              sx={{
-                margin: '24px'
-              }}
-            >
+            <Typography variant="h4">
               Version {props.osInfo.repo.version} Available
             </Typography>
           )}
@@ -118,7 +136,6 @@ export const Landing = (props: any): JSX.Element => {
             <Button
               disabled={
                 props.osInfo.current.version >= props.osInfo.repo.version ||
-                !props.osInfo.repo.downloaded ||
                 installing
               }
               onClick={async () => {
@@ -148,13 +165,17 @@ export const Landing = (props: any): JSX.Element => {
           Install PinormOS Version {props.osInfo.repo.version}?
         </DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Click Okay to reboot the DSDK and install PinormOS version{' '}
-            {props.osInfo.repo.version}. The installation process may take
-            several minutes to complete. During installation, ADB connection to
-            the DSDK may be unavailable and you may wish to close WebDS during
-            this time. Once ADB connection has been re-established, you can then
-            do ADB port forwarding and re-open WebDS.
+          <DialogContentText gutterBottom>
+            Click Okay to download and install PinormOS{' '}
+            {props.osInfo.repo.version}. The installation process involves
+            rebooting the DSDK and may take several minutes to complete. During
+            installation, ADB connection to the DSDK may be unavailable and you
+            may wish to close WebDS during this time. Once ADB connection has
+            been re-established, you can then do ADB port forwarding and re-open
+            WebDS.
+          </DialogContentText>
+          <DialogContentText sx={{ color: 'red' }}>
+            Please keep the DSDK powered during the installing process.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
