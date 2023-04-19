@@ -101,7 +101,21 @@ export const Landing = (props: any): JSX.Element => {
               No Update Available
             </Typography>
           ) : downloaded ? (
-            <Typography variant="h4">Rebooting DSDK...</Typography>
+            <>
+              <Typography variant="h4">Rebooting DSDK...</Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  margin: '32px 64px 0px 64px',
+                  whiteSpace: 'normal',
+                  color: 'red'
+                }}
+              >
+                The installation process may take several minutes to complete
+                after the reboot. Please do not unplug the DSDK during the
+                installation process.
+              </Typography>
+            </>
           ) : installing ? (
             <div>
               <Typography
