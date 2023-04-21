@@ -149,8 +149,8 @@ export const Landing = (props: any): JSX.Element => {
           >
             <Button
               disabled={
-                props.osInfo.current.version >= props.osInfo.repo.version ||
-                installing
+                props.osInfo.current.versionNum >=
+                  props.osInfo.repo.versionNum || installing
               }
               onClick={async () => {
                 setOpenDialog(true);
