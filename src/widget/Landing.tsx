@@ -91,7 +91,7 @@ export const Landing = (props: any): JSX.Element => {
             justifyContent: 'center'
           }}
         >
-          {props.osInfo.current.version >= props.osInfo.repo.version ? (
+          {props.osInfo.current.versionNum >= props.osInfo.repo.versionNum ? (
             <Typography
               variant="h4"
               sx={{
