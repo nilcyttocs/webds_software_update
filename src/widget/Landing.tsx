@@ -107,13 +107,22 @@ export const Landing = (props: any): JSX.Element => {
                 variant="body1"
                 sx={{
                   margin: '32px 64px 0px 64px',
+                  whiteSpace: 'normal'
+                }}
+              >
+                The installation process may take several minutes to complete
+                after the reboot. Please proceed to re-establish ADB port
+                forwarding and then reload the webpage.
+              </Typography>
+              <Typography
+                variant="h5"
+                sx={{
+                  margin: '32px 64px 0px 64px',
                   whiteSpace: 'normal',
                   color: 'red'
                 }}
               >
-                The installation process may take several minutes to complete
-                after the reboot. Please do not unplug the DSDK during the
-                installation process.
+                Please do not unplug the DSDK during installation.
               </Typography>
             </>
           ) : installing ? (
@@ -183,10 +192,7 @@ export const Landing = (props: any): JSX.Element => {
             Click Okay to download and install PinormOS{' '}
             {props.osInfo.repo.version}. The installation process involves
             rebooting the DSDK and may take several minutes to complete after
-            the reboot. During installation, ADB connection to the DSDK may be
-            unavailable and you may wish to close WebDS during this time. Once
-            ADB connection has been re-established, you can then do ADB port
-            forwarding and re-open WebDS.
+            the reboot.
           </DialogContentText>
           <DialogContentText sx={{ color: 'red' }}>
             Please keep the DSDK powered during the installation process.
