@@ -59,6 +59,11 @@ export const Landing = (props: any): JSX.Element => {
     setInstalling(true);
     handleDialogClose();
     try {
+      await webdsService.analytics.uploadStatistics();
+    } catch (error) {
+      console.log(error);
+    }
+    try {
       await webdsService.pinormos.downloadTarball();
       setDownloaded(true);
     } catch (error) {
